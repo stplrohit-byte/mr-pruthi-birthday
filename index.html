@@ -287,60 +287,54 @@ p{margin:0}
 
 canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:65}
 
-/* ---------- Tripu: talking trailer guide ---------- */
-.guide{position:fixed;right:calc(10px + env(safe-area-inset-right, 0px));bottom:calc(10px + env(safe-area-inset-bottom, 0px));z-index:80;
-  display:flex;flex-direction:column;align-items:flex-end;gap:6px;pointer-events:none;transition:right .6s cubic-bezier(.3,1.3,.5,1),left .6s cubic-bezier(.3,1.3,.5,1);
-  animation:tripuIn 1.1s .4s cubic-bezier(.2,.8,.2,1) both}
-.guide.left{right:auto;left:calc(10px + env(safe-area-inset-left, 0px));align-items:flex-start}
-@keyframes tripuIn{from{transform:translateX(160px);opacity:0}}
-.g-bubble{pointer-events:auto;position:relative;max-width:min(250px,64vw);background:var(--steel);color:var(--fg);border:2px solid var(--gold);
-  border-radius:16px;padding:10px 12px 10px 14px;font-size:14px;line-height:1.4;font-weight:600;box-shadow:0 12px 30px rgba(29,42,68,.18);
-  display:flex;gap:8px;align-items:flex-start}
-.g-bubble::after{content:"";position:absolute;bottom:-9px;right:34px;width:14px;height:14px;background:var(--steel);border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg)}
-.guide.left .g-bubble::after{right:auto;left:34px}
-.g-bubble.pop{animation:bubPop .45s cubic-bezier(.3,1.5,.5,1)}
-@keyframes bubPop{from{transform:scale(.7);opacity:0}}
-.g-text{min-width:0}
-.g-name{display:block;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:2px}
-.g-voice{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--steel-2);color:var(--fg);display:grid;place-items:center;padding:0}
-.g-voice svg{width:15px;height:15px}
-.g-voice.off{opacity:.55}
-.g-bot{pointer-events:auto;background:none;border:0;padding:0;width:96px;position:relative;filter:drop-shadow(0 8px 14px rgba(29,42,68,.25))}
+
+/* ---------- Tripu: small talking trailer guide (voice only) ---------- */
+.guide{position:fixed;left:0;top:0;z-index:80;width:64px;pointer-events:none;
+  transition:transform .8s cubic-bezier(.45,1.4,.5,1),opacity .4s;opacity:0}
+.guide.on{opacity:1}
+.g-bot{pointer-events:auto;background:none;border:0;padding:0;width:64px;display:block;filter:drop-shadow(0 6px 10px rgba(29,42,68,.28))}
 .g-bot svg{display:block;width:100%;height:auto;animation:tripuBob 1.6s ease-in-out infinite}
+.guide.moving .g-bot svg{animation:tripuDrive .25s linear infinite}
 .g-bot.hop svg{animation:tripuHop .55s cubic-bezier(.3,1.6,.5,1)}
-@keyframes tripuBob{50%{transform:translateY(-4px)}}
-@keyframes tripuHop{40%{transform:translateY(-16px) rotate(-6deg)}}
+@keyframes tripuBob{50%{transform:translateY(-3px)}}
+@keyframes tripuDrive{50%{transform:translateY(-1.5px) rotate(-1deg)}}
+@keyframes tripuHop{40%{transform:translateY(-12px) rotate(-6deg)}}
 .g-bot .mouth{transform-box:fill-box;transform-origin:center}
-.g-bot.talk .mouth{animation:talk .18s ease-in-out infinite alternate}
+.guide.talk .g-bot .mouth{animation:talk .17s ease-in-out infinite alternate}
 @keyframes talk{from{transform:scaleY(.35)}to{transform:scaleY(1.15)}}
 .g-bot .lids{transform-box:fill-box;transform-origin:center;animation:blinkEye 4.5s infinite}
 @keyframes blinkEye{0%,93%,100%{transform:scaleY(0)}96%{transform:scaleY(1)}}
 .g-bot .lamp{animation:lampBlink 1.2s steps(1) infinite}
 .g-bot .lamp.b{animation-delay:.6s}
 @keyframes lampBlink{50%{fill:#ff7a2e}}
-.g-tapme{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;background:var(--ink);color:#fff;border-radius:999px;padding:3px 9px;text-align:center;align-self:center}
+.g-waves{position:absolute;top:6px;left:-14px;display:flex;gap:2px;align-items:center;height:16px;opacity:0;transition:opacity .2s}
+.guide.right-side .g-waves{left:auto;right:-14px}
+.guide.talk .g-waves{opacity:1}
+.g-waves i{display:block;width:3px;height:6px;border-radius:2px;background:var(--gold-deep);animation:wave .5s ease-in-out infinite alternate}
+.g-waves i:nth-child(2){animation-delay:.15s}.g-waves i:nth-child(3){animation-delay:.3s}
+@keyframes wave{to{height:15px}}
+.g-voice{pointer-events:auto;position:absolute;right:-6px;top:-8px;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--gold);
+  background:var(--steel);color:var(--fg);display:grid;place-items:center;padding:0;box-shadow:0 3px 8px rgba(29,42,68,.2)}
+.g-voice svg{width:13px;height:13px}
+.g-voice.off{opacity:.6}
+.g-voice.off .wave{display:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .tap-hint{position:fixed;left:0;top:0;z-index:85;pointer-events:none;width:0;height:0}
-.tap-hint[hidden]{display:none}
-.tap-hint .ring{position:absolute;left:-30px;top:-30px;width:60px;height:60px;border-radius:50%;border:3px solid var(--gold);box-shadow:0 0 0 4px rgba(242,181,68,.25);animation:ringPulse 1.3s ease-out infinite}
+.tap-hint .ring{position:absolute;left:-24px;top:-24px;width:48px;height:48px;border-radius:50%;border:3px solid var(--gold);box-shadow:0 0 0 4px rgba(242,181,68,.25);animation:ringPulse 1.3s ease-out infinite}
 @keyframes ringPulse{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.5);opacity:0}}
-.tap-hint .finger{position:absolute;left:-14px;top:-4px;width:34px;height:40px;animation:fingerTap 1.3s ease-in-out infinite}
-@keyframes fingerTap{0%,100%{transform:translate(6px,14px)}45%{transform:translate(0,0)}55%{transform:translate(0,0) scale(.92)}}
-.tap-hint .label{position:absolute;left:50%;top:-62px;transform:translateX(-50%);white-space:nowrap;background:#d93a2b;color:#fff;font-family:var(--f-mono);font-weight:600;
-  font-size:11px;letter-spacing:.12em;padding:5px 10px;border-radius:999px;box-shadow:0 6px 16px rgba(217,58,43,.35);animation:labelBob 1.3s ease-in-out infinite}
-.tap-hint .label::after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top-color:#d93a2b}
-.tap-hint.below .label{top:auto;bottom:-70px}
-.tap-hint.below .label::after{bottom:auto;top:-5px;border-top:0;border-bottom:5px solid #d93a2b}
-@keyframes labelBob{50%{transform:translateX(-50%) translateY(-5px)}}
-
-.guide.top{bottom:auto;top:calc(58px + env(safe-area-inset-top, 0px));right:auto;left:calc(10px + env(safe-area-inset-left, 0px));flex-direction:column-reverse;align-items:flex-start}
-.guide.top .g-bubble::after{bottom:auto;top:-9px;right:auto;left:34px;transform:rotate(225deg)}
-.guide.mini .g-bubble,.guide.mini .g-tapme{display:none}
-.guide.mini{top:calc(10px + env(safe-area-inset-top, 0px))}
-.guide.mini .g-bot{width:64px}
-@media (max-width:420px){.g-bot{width:80px}.g-bubble{font-size:13px}}
+.tap-hint .finger{position:absolute;left:-12px;top:-2px;width:28px;height:33px;animation:fingerTap 1.3s ease-in-out infinite}
+@keyframes fingerTap{0%,100%{transform:translate(6px,12px)}45%{transform:translate(0,0)}55%{transform:translate(0,0) scale(.92)}}
+.tap-hint .label{position:absolute;left:50%;top:-48px;transform:translateX(-50%);white-space:nowrap;background:#d93a2b;color:#fff;font-family:var(--f-mono);font-weight:600;
+  font-size:9.5px;letter-spacing:.12em;padding:3px 8px;border-radius:999px;box-shadow:0 4px 10px rgba(217,58,43,.35);animation:labelBob 1.3s ease-in-out infinite}
+.tap-hint .label::after{content:"";position:absolute;left:50%;bottom:-4px;margin-left:-4px;border:4px solid transparent;border-bottom:0;border-top-color:#d93a2b}
+.tap-hint.below .label{top:auto;bottom:-56px}
+.tap-hint.below .label::after{bottom:auto;top:-4px;border-top:0;border-bottom:4px solid #d93a2b}
+@keyframes labelBob{50%{transform:translateX(-50%) translateY(-4px)}}
+.plate .vol{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;color:#6b6250}
+.plate .vol svg{width:14px;height:14px}
 
 @media (prefers-reduced-motion: reduce){
-  .guide,.g-bot svg{animation:none!important}
+  .g-bot svg{animation:none!important}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.2s!important}
 }
 </style>
@@ -350,12 +344,10 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
 
 <button class="sound" id="sound" type="button" hidden aria-pressed="false">♪ Music on</button>
 <canvas id="fx"></canvas>
-<div class="guide" id="guide" aria-live="polite">
-  <div class="g-bubble" id="gBubble">
-    <div class="g-text"><span class="g-name">Tripu · STPL birthday trailer</span><span id="gText">Namaste Sir! I am Tripu, the STPL birthday trailer. Tap the gate to open your special delivery.</span></div>
-    <button class="g-voice" id="gVoice" type="button" aria-label="Turn Tripu's voice off" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
-  </div>
-  <button class="g-bot" id="gBot" type="button" aria-label="Tap Tripu to hear the message again">
+<div class="guide" id="guide">
+  <span class="sr-only" id="gText" aria-live="polite"></span>
+  <span class="g-waves" aria-hidden="true"><i></i><i></i><i></i></span>
+  <button class="g-bot" id="gBot" type="button" aria-label="Tripu, the STPL birthday trailer. Tap to hear him again">
     <svg viewBox="0 0 120 138" aria-hidden="true">
       <ellipse cx="60" cy="133" rx="44" ry="5" fill="rgba(29,42,68,.18)"/>
       <path d="M44 22 L58 0 L70 24 Z" fill="#d93a2b"/><path d="M50 13 L64 14 M47 18 L67 19" stroke="#fff" stroke-width="3"/><circle cx="58" cy="1" r="4" fill="#ffd98a"/>
@@ -377,7 +369,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
       <rect x="45" y="105.5" width="30" height="7" rx="1.5" fill="#fff"/><text x="60" y="111" text-anchor="middle" font-family="monospace" font-size="6" font-weight="700" fill="#1d2433">STPL</text>
     </svg>
   </button>
-  <span class="g-tapme" id="gTapme">Tap me to hear</span>
+  <button class="g-voice" id="gVoice" type="button" aria-label="Turn Tripu's voice off" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
 </div>
 <div class="tap-hint" id="tapHint" hidden>
   <span class="ring"></span>
@@ -395,6 +387,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
     <h2>A special delivery for Mr. Hargobind Pruthi</h2>
     <p>Sender: Every department of Sushila Transport</p>
     <button class="tap" id="openBtn" type="button">Tap to open, Sir</button>
+    <div class="vol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>Volume up · Tripu will guide you</div>
   </div>
 </div>
 
@@ -631,12 +624,13 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
   }
 
 
-  // ---------- Tripu: talking trailer guide ----------
+
+  // ---------- Tripu: small talking trailer guide (voice only) ----------
   (function tripu(){
-    const G=$("guide"),bubble=$("gBubble"),textEl=$("gText"),bot=$("gBot"),hint=$("tapHint"),vBtn=$("gVoice"),tapme=$("gTapme");
+    const G=$("guide"),bot=$("gBot"),hint=$("tapHint"),vBtn=$("gVoice"),live=$("gText");
     const synth=("speechSynthesis" in window)?window.speechSynthesis:null;
-    let voiceOn=!!synth,unlocked=false,lastKey="",curText=textEl.textContent,target=null,talkTimer=0,voice=null;
-    if(!synth){vBtn.hidden=true;tapme.hidden=true;}
+    let voiceOn=!!synth,unlocked=false,lastKey="",curSpeech="",target=null,anchor=null,park="corner",talkTimer=0,voice=null,firstTalk=true;
+    if(!synth)vBtn.hidden=true;
     function pickVoice(){
       if(!synth)return;const vs=synth.getVoices();if(!vs.length)return;
       const indian=v=>/en[-_]IN/i.test(v.lang)||/india|rishi|veena|lekha|heera|ravi|neerja|prabhat/i.test(v.name);
@@ -644,88 +638,103 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
         ||vs.find(v=>/hi[-_]IN/i.test(v.lang))||vs.find(v=>/en[-_]GB/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||vs[0];
     }
     if(synth){pickVoice();synth.onvoiceschanged=pickVoice;}
-    function talk(ms){bot.classList.add("talk");clearTimeout(talkTimer);talkTimer=setTimeout(()=>bot.classList.remove("talk"),ms);}
+    // keep the birthday music playing, just softer while Tripu talks
+    function duck(on){try{if(master&&ac&&!muted){master.gain.cancelScheduledValues(ac.currentTime);master.gain.setTargetAtTime(on?.16:.55,ac.currentTime,.25);}}catch(e){}}
+    function talking(on,ms){
+      clearTimeout(talkTimer);G.classList.toggle("talk",on);duck(on);
+      if(on&&ms)talkTimer=setTimeout(()=>talking(false),ms);
+    }
     function speak(t){
-      talk(Math.min(9000,t.length*65));
-      if(!synth||!voiceOn||!unlocked)return;
+      if(!t)return;live.textContent=t;
+      if(!synth||!voiceOn||!unlocked){return;}
       try{
         synth.cancel();const u=new SpeechSynthesisUtterance(t);
-        if(voice)u.voice=voice;u.lang=voice?voice.lang:"en-IN";u.rate=.95;u.pitch=1.25;
-        u.onstart=()=>bot.classList.add("talk");u.onend=()=>{clearTimeout(talkTimer);bot.classList.remove("talk");};
+        if(voice)u.voice=voice;u.lang=voice?voice.lang:"en-IN";u.rate=.93;u.pitch=1.2;
+        u.onstart=()=>talking(true);u.onend=u.onerror=()=>talking(false);
+        talking(true,Math.min(60000,t.length*85));
         synth.speak(u);
       }catch(e){}
     }
-    let curSpeech="";
-    function say(t,spoken){
-      curText=t;curSpeech=spoken||t;textEl.textContent=t;
-      bubble.classList.remove("pop");void bubble.offsetWidth;bubble.classList.add("pop");
-      bot.classList.remove("hop");void bot.offsetWidth;bot.classList.add("hop");
-      speak(curSpeech);
-    }
+    function hop(){bot.classList.remove("hop");void bot.offsetWidth;bot.classList.add("hop");}
     function unlock(){
-      if(unlocked)return;unlocked=true;tapme.hidden=true;
-      if(synth&&voiceOn){try{synth.speak(new SpeechSynthesisUtterance(""));}catch(e){}}
+      if(unlocked)return;unlocked=true;
+      if(synth&&voiceOn){try{synth.speak(new SpeechSynthesisUtterance(" "));}catch(e){}}
     }
-    document.addEventListener("pointerdown",unlock,{capture:true,once:false});
-    bot.addEventListener("click",()=>{unlock();say(curText,curSpeech);});
+    document.addEventListener("pointerdown",unlock,{capture:true});
+    bot.addEventListener("click",()=>{unlock();hop();speak(curSpeech);});
     vBtn.addEventListener("click",()=>{
       unlock();voiceOn=!voiceOn;vBtn.classList.toggle("off",!voiceOn);vBtn.setAttribute("aria-pressed",String(voiceOn));
       vBtn.setAttribute("aria-label",voiceOn?"Turn Tripu's voice off":"Turn Tripu's voice on");
-      if(!voiceOn&&synth)synth.cancel();else speak(curSpeech||curText);
+      if(!voiceOn){if(synth)synth.cancel();talking(false);}else speak(curSpeech);
     });
     const visible=el=>el&&!el.hidden&&el.getClientRects().length>0;
     function stage(){
       const total=DEPTS.length,done=opened.size;
-      if(!$("gate").classList.contains("open"))return{key:"gate",t:$("openBtn"),msg:"Namaste Sir! I am Tripu, the STPL birthday trailer. Tap the gate to open your special delivery."};
+      if(!$("gate").classList.contains("open"))
+        return{key:"gate",t:$("openBtn"),a:$("plate"),side:"below",say:"Namaste Sir! Happy Birthday! I am Tripu, your STPL birthday trailer. Tap the gate to open your special delivery."};
       if(!$("overlay").hidden){
         const d=lastCar?DEPTS[+lastCar.dataset.i]:null;
-        return{key:"note"+(lastCar?lastCar.dataset.i:"")+"-"+done,t:$("closeNote"),msg:"I am reading this wish for you, Sir. When it ends, tap Mark as delivered.",
-          speech:d?("A birthday message from the "+d.name+". "+d.title+". "+d.msg+" ... With respect, the "+d.name+". Sir, please tap Mark as delivered."):null};
+        return{key:"note"+(lastCar?lastCar.dataset.i:"")+"-"+done,t:$("closeNote"),a:null,park:"topleft",
+          say:d?("A birthday message from the "+d.name+". "+d.title+". "+d.msg+" With respect, the "+d.name+". Sir, please tap Mark as delivered."):"Please tap Mark as delivered."};
       }
       if(done<total){
         const next=document.querySelector("#rig .car:not(.done)");
-        return{key:"cars"+done,t:next,scroll:true,msg:done===0
+        let line=done===0
           ?"Every department has loaded a birthday wish on my trailer. Tap any car to open its message."
-          :done+" of "+total+" wishes delivered! Tap the next car, Sir."};
+          :(total-done===1?"Only one wish left, Sir. Tap the last car.":done+" wishes delivered, "+(total-done)+" to go. Tap the next car, Sir.");
+        if(done===0&&firstTalk)line="Namaste Sir, and a very Happy Birthday! I am Tripu, your STPL birthday trailer. "+line;
+        return{key:"cars"+done,t:next,a:$("rig"),side:"below",scroll:true,say:line};
       }
-      if($("cakeScene").hidden)return{key:"cake",t:$("toCake"),scroll:true,msg:"All "+total+" wishes delivered! Now tap One last delivery."};
+      if($("cakeScene").hidden)return{key:"cake",t:$("toCake"),a:$("toCake"),side:"right",scroll:true,say:"All "+total+" wishes are delivered, Sir! Now tap One last delivery."};
       if($("posterScene").hidden){
         const left=document.querySelectorAll("#candles .candle:not(.out)");
-        if(left.length===5)return{key:"c5",t:left[0],scroll:true,msg:"Make a wish, Sir! Tap each candle to blow it out. Every candle sends my birthday truck to one zone."};
-        if(left.length>0)return{key:"c"+left.length,t:left[0],msg:(5-left.length)+(5-left.length===1?" zone":" zones")+" done! "+left.length+(left.length===1?" candle":" candles")+" to go. Keep blowing!"};
-        return{key:"c0",t:null,msg:"Green signal! Your wish has reached every zone of STPL."};
+        const a=document.querySelector(".cake");
+        if(left.length===5)return{key:"c5",t:left[0],a,side:"corner",scroll:true,say:"Make a wish, Sir! Tap each candle to blow it out. Every candle sends my birthday truck to one zone of STPL."};
+        if(left.length>0)return{key:"c"+left.length,t:left[0],a,side:"corner",say:left.length===1?"Last candle, Sir! Blow it out!":left.length+" candles to go. Keep blowing!"};
+        return{key:"c0",t:null,a,side:"corner",say:"Green signal! Your wish has reached every zone of STPL."};
       }
-      return{key:"poster",t:null,msg:"Happy Birthday, Sir! Wishes delivered to every corner of STPL. With love from your whole team.",
-        speech:"Happy Birthday, Mister Hargobind Pruthi! You built more than a fleet. You built a family that moves India, and every one of us is proud to travel with you. With respect and gratitude, your STPL family."};
+      return{key:"poster",t:null,a:null,park:"corner",say:"Happy Birthday, Mister Hargobind Pruthi! You built more than a fleet. You built a family that moves India, and every one of us is proud to travel with you. With respect and gratitude, your STPL family."};
     }
     function sync(){
-      const s=stage();target=visible(s.t)?s.t:null;
-      G.classList.toggle("mini",s.key.startsWith("note"));
+      const s=stage();target=visible(s.t)?s.t:null;anchor=visible(s.a)?s.a:null;park=s.park||"corner";G._side=s.side;
       if(s.key!==lastKey){
-        lastKey=s.key;say(s.msg,s.speech);
+        lastKey=s.key;curSpeech=s.say;hop();
+        if(s.key.startsWith("cars")&&unlocked)firstTalk=false;
+        speak(s.say);
         if(s.scroll&&target)setTimeout(()=>{try{target.scrollIntoView({behavior:"smooth",block:"center"});}catch(e){}},350);
       }
     }
+    let gx=-80,gy=0,lastMove=0;
+    function moveTo(x,y){
+      const W=64,H=74;x=Math.max(6,Math.min(innerWidth-W-6,x));y=Math.max(54,Math.min(innerHeight-H-6,y));
+      if(Math.abs(x-gx)>2||Math.abs(y-gy)>2){
+        G.classList.toggle("right-side",x<gx);
+        gx=x;gy=y;G.style.transform="translate("+x+"px,"+y+"px)";G.classList.add("moving");lastMove=performance.now();
+      }else if(performance.now()-lastMove>800)G.classList.remove("moving");
+    }
     function place(){
-      if(target&&visible(target)){
-        const r=target.getBoundingClientRect();
-        const onScreen=r.bottom>0&&r.top<innerHeight&&r.width>0;
-        hint.hidden=!onScreen;
-        if(onScreen){
-          const cx=r.left+r.width/2,cy=r.top+r.height/2;
-          hint.style.transform="translate("+cx+"px,"+cy+"px)";
-          hint.classList.toggle("below",r.top<90);
-          // keep Tripu out of the way of the thing he points at
-          // keep Tripu and his bubble away from the thing he points at
-          G.classList.toggle("top",cy>innerHeight*.48);
-          G.classList.remove("left");
-        }
-      }else{hint.hidden=true;G.classList.remove("top");}
+      // tap pointer on the exact spot
+      if(target){
+        const r=target.getBoundingClientRect();const on=r.bottom>0&&r.top<innerHeight&&r.width>0;
+        hint.hidden=!on;
+        if(on){hint.style.transform="translate("+(r.left+r.width/2)+"px,"+(r.top+r.height/2)+"px)";hint.classList.toggle("below",r.top<80);}
+      }else hint.hidden=true;
+      // Tripu drives next to the step, without covering it
+      const W=64,H=74;
+      if(anchor){
+        const r=anchor.getBoundingClientRect();
+        if(r.bottom<0||r.top>innerHeight)moveTo(innerWidth-W-10,innerHeight-H-10);
+        else if(G._side==="right"&&r.right+W+12<innerWidth)moveTo(r.right+10,r.top+r.height/2-H/2);
+        else if(G._side==="corner")moveTo(r.right-W+14,r.bottom-H+4);
+        else moveTo(Math.min(innerWidth-W-10,r.right-W),r.bottom+6);
+      }else if(park==="topleft")moveTo(10,12+(window.visualViewport?0:0));
+      else moveTo(innerWidth-W-10,innerHeight-H-10);
       requestAnimationFrame(place);
     }
     document.addEventListener("click",()=>setTimeout(sync,120),true);
-    setInterval(sync,700);
-    say(curText);lastKey="gate";sync();requestAnimationFrame(place);
+    setInterval(sync,600);
+    setTimeout(()=>G.classList.add("on"),600);
+    sync();requestAnimationFrame(place);
   })();
   $("openBtn").addEventListener("click",openGate);
   document.querySelectorAll(".door").forEach(d=>d.addEventListener("click",openGate));
