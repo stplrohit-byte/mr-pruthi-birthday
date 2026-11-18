@@ -658,11 +658,34 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
       const bin=atob(CLIPS[k]);const u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
       return new Promise((res,rej)=>ac.decodeAudioData(u8.buffer,b=>{VBUF[k]=b;res(b);},rej));
     }
-    function stopVoice(){if(vSrc){try{vSrc.onended=null;vSrc.stop();}catch(e){}vSrc=null;}if(synth){try{synth.cancel();}catch(e){}}}
+
+    // ---- studio Indian voice (vidIQ "Bunty"), streamed from vidIQ; falls back to the built-in voice ----
+    const VQ_URL="https://assets.vidiq.com/voiceovers/0c065e84-ba2a-47f6-b5ee-e4accf42bb40/13b0c2c8-60ad-41d3-9147-1875104536b8.mp3";
+    const VQ_SEG={"welcome": [0, 10.762449], "note": [10.762449, 3.004082], "next": [13.766531, 2.35102], "lastcar": [16.117551, 3.239184], "cake": [19.356735, 3.160816], "candles": [22.517551, 4.91102], "keep": [27.428571, 2.194286], "lastcandle": [29.622857, 2.272653], "green": [31.89551, 3.082449], "poster": [34.977959, 5.485714]};
+    const vq=new Audio();vq.preload="auto";vq.crossOrigin=null;let vqOk=false,vqStop=0;
+    vq.addEventListener("canplaythrough",()=>{vqOk=true;},{once:true});
+    vq.addEventListener("error",()=>{vqOk=false;});
+    try{vq.src=VQ_URL;vq.load();}catch(e){}
+    function vqPlay(k){
+      const seg=VQ_SEG[k];if(!seg||!vqOk)return false;
+      try{
+        stopVoice();clearTimeout(vqStop);
+        vq.currentTime=seg[0];vq.volume=1;
+        const p=vq.play();if(p&&p.catch)p.catch(()=>{});
+        talking(true,seg[1]*1000+250);cap.hidden=true;
+        vqStop=setTimeout(()=>{vq.pause();talking(false);},seg[1]*1000+120);
+        window.__tripuPlayed=(window.__tripuPlayed||[]).concat("vq:"+k);
+        return true;
+      }catch(e){return false;}
+    }
+    // unlock the audio element inside the very first tap (iPhone rule)
+    function vqUnlock(){try{if(!vqOk)return;vq.muted=true;const p=vq.play();if(p&&p.then)p.then(()=>{vq.pause();vq.muted=false;}).catch(()=>{vq.muted=false;});}catch(e){}}
+    function stopVoice(){try{vq.pause();}catch(e){}if(vSrc){try{vSrc.onended=null;vSrc.stop();}catch(e){}vSrc=null;}if(synth){try{synth.cancel();}catch(e){}}}
     function speak(t,clip){
       if(!t)return;live.textContent=t;
       if(!voiceOn){showCap(t);talking(true,Math.min(8000,t.length*60));return;}
       if(!unlocked)return;
+      if(clip&&vqPlay(clip))return;
       if(clip&&CLIPS[clip]){
         try{
           if(!ac)startMusic();
@@ -710,7 +733,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
     const WELCOME_CARS="Namaste Sir! Happy, happy Birthday! I am Tripu, your STPL birthday trailer, and I am so excited to see you! Every department has loaded a special wish on my trailer. Tap any car, and let's open them together!";
     function gateTap(){
       if($("gate").classList.contains("open"))return;
-      unlocked=true;firstTalk=false;lastKey="cars0";curSpeech=WELCOME_CARS;curClip="welcome";hop();setTimeout(()=>speak(WELCOME_CARS,"welcome"),60);
+      unlocked=true;firstTalk=false;lastKey="cars0";curSpeech=WELCOME_CARS;curClip="welcome";hop();if(!(voiceOn&&vqPlay("welcome")))setTimeout(()=>speak(WELCOME_CARS,"welcome"),60);
     }
     $("openBtn").addEventListener("click",gateTap);
     document.querySelectorAll(".door").forEach(d=>d.addEventListener("click",gateTap));
