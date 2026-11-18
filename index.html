@@ -287,7 +287,60 @@ p{margin:0}
 
 canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:65}
 
+/* ---------- Tripu: talking trailer guide ---------- */
+.guide{position:fixed;right:calc(10px + env(safe-area-inset-right, 0px));bottom:calc(10px + env(safe-area-inset-bottom, 0px));z-index:80;
+  display:flex;flex-direction:column;align-items:flex-end;gap:6px;pointer-events:none;transition:right .6s cubic-bezier(.3,1.3,.5,1),left .6s cubic-bezier(.3,1.3,.5,1);
+  animation:tripuIn 1.1s .4s cubic-bezier(.2,.8,.2,1) both}
+.guide.left{right:auto;left:calc(10px + env(safe-area-inset-left, 0px));align-items:flex-start}
+@keyframes tripuIn{from{transform:translateX(160px);opacity:0}}
+.g-bubble{pointer-events:auto;position:relative;max-width:min(250px,64vw);background:var(--steel);color:var(--fg);border:2px solid var(--gold);
+  border-radius:16px;padding:10px 12px 10px 14px;font-size:14px;line-height:1.4;font-weight:600;box-shadow:0 12px 30px rgba(29,42,68,.18);
+  display:flex;gap:8px;align-items:flex-start}
+.g-bubble::after{content:"";position:absolute;bottom:-9px;right:34px;width:14px;height:14px;background:var(--steel);border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg)}
+.guide.left .g-bubble::after{right:auto;left:34px}
+.g-bubble.pop{animation:bubPop .45s cubic-bezier(.3,1.5,.5,1)}
+@keyframes bubPop{from{transform:scale(.7);opacity:0}}
+.g-text{min-width:0}
+.g-name{display:block;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:2px}
+.g-voice{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--steel-2);color:var(--fg);display:grid;place-items:center;padding:0}
+.g-voice svg{width:15px;height:15px}
+.g-voice.off{opacity:.55}
+.g-bot{pointer-events:auto;background:none;border:0;padding:0;width:96px;position:relative;filter:drop-shadow(0 8px 14px rgba(29,42,68,.25))}
+.g-bot svg{display:block;width:100%;height:auto;animation:tripuBob 1.6s ease-in-out infinite}
+.g-bot.hop svg{animation:tripuHop .55s cubic-bezier(.3,1.6,.5,1)}
+@keyframes tripuBob{50%{transform:translateY(-4px)}}
+@keyframes tripuHop{40%{transform:translateY(-16px) rotate(-6deg)}}
+.g-bot .mouth{transform-box:fill-box;transform-origin:center}
+.g-bot.talk .mouth{animation:talk .18s ease-in-out infinite alternate}
+@keyframes talk{from{transform:scaleY(.35)}to{transform:scaleY(1.15)}}
+.g-bot .lids{transform-box:fill-box;transform-origin:center;animation:blinkEye 4.5s infinite}
+@keyframes blinkEye{0%,93%,100%{transform:scaleY(0)}96%{transform:scaleY(1)}}
+.g-bot .lamp{animation:lampBlink 1.2s steps(1) infinite}
+.g-bot .lamp.b{animation-delay:.6s}
+@keyframes lampBlink{50%{fill:#ff7a2e}}
+.g-tapme{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;background:var(--ink);color:#fff;border-radius:999px;padding:3px 9px;text-align:center;align-self:center}
+.tap-hint{position:fixed;left:0;top:0;z-index:85;pointer-events:none;width:0;height:0}
+.tap-hint[hidden]{display:none}
+.tap-hint .ring{position:absolute;left:-30px;top:-30px;width:60px;height:60px;border-radius:50%;border:3px solid var(--gold);box-shadow:0 0 0 4px rgba(242,181,68,.25);animation:ringPulse 1.3s ease-out infinite}
+@keyframes ringPulse{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.5);opacity:0}}
+.tap-hint .finger{position:absolute;left:-14px;top:-4px;width:34px;height:40px;animation:fingerTap 1.3s ease-in-out infinite}
+@keyframes fingerTap{0%,100%{transform:translate(6px,14px)}45%{transform:translate(0,0)}55%{transform:translate(0,0) scale(.92)}}
+.tap-hint .label{position:absolute;left:50%;top:-62px;transform:translateX(-50%);white-space:nowrap;background:#d93a2b;color:#fff;font-family:var(--f-mono);font-weight:600;
+  font-size:11px;letter-spacing:.12em;padding:5px 10px;border-radius:999px;box-shadow:0 6px 16px rgba(217,58,43,.35);animation:labelBob 1.3s ease-in-out infinite}
+.tap-hint .label::after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top-color:#d93a2b}
+.tap-hint.below .label{top:auto;bottom:-70px}
+.tap-hint.below .label::after{bottom:auto;top:-5px;border-top:0;border-bottom:5px solid #d93a2b}
+@keyframes labelBob{50%{transform:translateX(-50%) translateY(-5px)}}
+
+.guide.top{bottom:auto;top:calc(58px + env(safe-area-inset-top, 0px));right:auto;left:calc(10px + env(safe-area-inset-left, 0px));flex-direction:column-reverse;align-items:flex-start}
+.guide.top .g-bubble::after{bottom:auto;top:-9px;right:auto;left:34px;transform:rotate(225deg)}
+.guide.mini .g-bubble,.guide.mini .g-tapme{display:none}
+.guide.mini{top:calc(10px + env(safe-area-inset-top, 0px))}
+.guide.mini .g-bot{width:64px}
+@media (max-width:420px){.g-bot{width:80px}.g-bubble{font-size:13px}}
+
 @media (prefers-reduced-motion: reduce){
+  .guide,.g-bot svg{animation:none!important}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.2s!important}
 }
 </style>
@@ -297,6 +350,40 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
 
 <button class="sound" id="sound" type="button" hidden aria-pressed="false">♪ Music on</button>
 <canvas id="fx"></canvas>
+<div class="guide" id="guide" aria-live="polite">
+  <div class="g-bubble" id="gBubble">
+    <div class="g-text"><span class="g-name">Tripu · STPL birthday trailer</span><span id="gText">Namaste Sir! I am Tripu, the STPL birthday trailer. Tap the gate to open your special delivery.</span></div>
+    <button class="g-voice" id="gVoice" type="button" aria-label="Turn Tripu's voice off" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
+  </div>
+  <button class="g-bot" id="gBot" type="button" aria-label="Tap Tripu to hear the message again">
+    <svg viewBox="0 0 120 138" aria-hidden="true">
+      <ellipse cx="60" cy="133" rx="44" ry="5" fill="rgba(29,42,68,.18)"/>
+      <path d="M44 22 L58 0 L70 24 Z" fill="#d93a2b"/><path d="M50 13 L64 14 M47 18 L67 19" stroke="#fff" stroke-width="3"/><circle cx="58" cy="1" r="4" fill="#ffd98a"/>
+      <rect x="14" y="104" width="20" height="26" rx="6" fill="#0b0f19"/><rect x="86" y="104" width="20" height="26" rx="6" fill="#0b0f19"/>
+      <rect x="32" y="20" width="56" height="10" rx="5" fill="#2a3653"/>
+      <circle class="lamp" cx="44" cy="25" r="3" fill="#ffd98a"/><circle cx="60" cy="25" r="3" fill="#ffd98a"/><circle class="lamp b" cx="76" cy="25" r="3" fill="#ffd98a"/>
+      <rect x="8" y="28" width="104" height="82" rx="20" fill="#f2b544"/>
+      <rect x="8" y="80" width="104" height="30" rx="14" fill="#c98a1c"/>
+      <rect x="17" y="36" width="86" height="36" rx="12" fill="#cfe9f7"/>
+      <path d="M20 40 L36 40 L24 66 L18 66 Z" fill="#fff" opacity=".55"/>
+      <ellipse cx="42" cy="54" rx="11" ry="12" fill="#fff"/><ellipse cx="78" cy="54" rx="11" ry="12" fill="#fff"/>
+      <circle cx="44" cy="56" r="5.5" fill="#1d2433"/><circle cx="80" cy="56" r="5.5" fill="#1d2433"/>
+      <circle cx="46" cy="53.5" r="1.8" fill="#fff"/><circle cx="82" cy="53.5" r="1.8" fill="#fff"/>
+      <g class="lids" fill="#f2b544"><ellipse cx="42" cy="54" rx="12" ry="13"/><ellipse cx="78" cy="54" rx="12" ry="13"/></g>
+      <circle cx="26" cy="76" r="5" fill="#ff9d7a" opacity=".55"/><circle cx="94" cy="76" r="5" fill="#ff9d7a" opacity=".55"/>
+      <g class="mouth"><rect x="43" y="77" width="34" height="15" rx="7.5" fill="#1d2433"/><path d="M49 80v9M55 80v9M61 80v9M67 80v9M73 80v9" stroke="#59637a" stroke-width="1.6"/></g>
+      <circle cx="21" cy="94" r="7" fill="#fff4c2" stroke="#2a3653" stroke-width="2"/><circle cx="99" cy="94" r="7" fill="#fff4c2" stroke="#2a3653" stroke-width="2"/>
+      <rect x="10" y="104" width="100" height="10" rx="4" fill="#2a3653"/>
+      <rect x="45" y="105.5" width="30" height="7" rx="1.5" fill="#fff"/><text x="60" y="111" text-anchor="middle" font-family="monospace" font-size="6" font-weight="700" fill="#1d2433">STPL</text>
+    </svg>
+  </button>
+  <span class="g-tapme" id="gTapme">Tap me to hear</span>
+</div>
+<div class="tap-hint" id="tapHint" hidden>
+  <span class="ring"></span>
+  <svg class="finger" viewBox="0 0 34 40" aria-hidden="true"><path d="M12 4a3 3 0 0 1 6 0v13l2-.6a3 3 0 0 1 3.4 1.6l.3.7 1.6-.3a3 3 0 0 1 3.4 2.3l.2.8 1-.1a3 3 0 0 1 3.3 3V31a9 9 0 0 1-9 9h-4.4a9 9 0 0 1-7.2-3.6L5 28.6a2.6 2.6 0 0 1 3.7-3.6L12 28z" fill="#fff" stroke="#1d2433" stroke-width="2" stroke-linejoin="round"/></svg>
+  <span class="label">TAP HERE</span>
+</div>
 
 <!-- Scene 0: the trailer gate -->
 <div class="gate" id="gate">
@@ -339,7 +426,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
   <section class="convoy" id="convoy">
     <div class="convoy-head">
       <h2>Your birthday convoy</h2>
-      <span class="count" id="count">0 / 10 delivered</span>
+      <span class="count" id="count">0 / 8 delivered</span>
     </div>
     <p class="hint">Tap each car to unload a message from that department.</p>
     <div class="road">
@@ -543,6 +630,103 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
     setTimeout(()=>{g.hidden=true;},1600);
   }
 
+
+  // ---------- Tripu: talking trailer guide ----------
+  (function tripu(){
+    const G=$("guide"),bubble=$("gBubble"),textEl=$("gText"),bot=$("gBot"),hint=$("tapHint"),vBtn=$("gVoice"),tapme=$("gTapme");
+    const synth=("speechSynthesis" in window)?window.speechSynthesis:null;
+    let voiceOn=!!synth,unlocked=false,lastKey="",curText=textEl.textContent,target=null,talkTimer=0,voice=null;
+    if(!synth){vBtn.hidden=true;tapme.hidden=true;}
+    function pickVoice(){
+      if(!synth)return;const vs=synth.getVoices();if(!vs.length)return;
+      const indian=v=>/en[-_]IN/i.test(v.lang)||/india|rishi|veena|lekha|heera|ravi|neerja|prabhat/i.test(v.name);
+      voice=vs.find(v=>indian(v)&&/google|natural|neural|premium|enhanced/i.test(v.name))||vs.find(indian)
+        ||vs.find(v=>/hi[-_]IN/i.test(v.lang))||vs.find(v=>/en[-_]GB/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||vs[0];
+    }
+    if(synth){pickVoice();synth.onvoiceschanged=pickVoice;}
+    function talk(ms){bot.classList.add("talk");clearTimeout(talkTimer);talkTimer=setTimeout(()=>bot.classList.remove("talk"),ms);}
+    function speak(t){
+      talk(Math.min(9000,t.length*65));
+      if(!synth||!voiceOn||!unlocked)return;
+      try{
+        synth.cancel();const u=new SpeechSynthesisUtterance(t);
+        if(voice)u.voice=voice;u.lang=voice?voice.lang:"en-IN";u.rate=.95;u.pitch=1.25;
+        u.onstart=()=>bot.classList.add("talk");u.onend=()=>{clearTimeout(talkTimer);bot.classList.remove("talk");};
+        synth.speak(u);
+      }catch(e){}
+    }
+    let curSpeech="";
+    function say(t,spoken){
+      curText=t;curSpeech=spoken||t;textEl.textContent=t;
+      bubble.classList.remove("pop");void bubble.offsetWidth;bubble.classList.add("pop");
+      bot.classList.remove("hop");void bot.offsetWidth;bot.classList.add("hop");
+      speak(curSpeech);
+    }
+    function unlock(){
+      if(unlocked)return;unlocked=true;tapme.hidden=true;
+      if(synth&&voiceOn){try{synth.speak(new SpeechSynthesisUtterance(""));}catch(e){}}
+    }
+    document.addEventListener("pointerdown",unlock,{capture:true,once:false});
+    bot.addEventListener("click",()=>{unlock();say(curText,curSpeech);});
+    vBtn.addEventListener("click",()=>{
+      unlock();voiceOn=!voiceOn;vBtn.classList.toggle("off",!voiceOn);vBtn.setAttribute("aria-pressed",String(voiceOn));
+      vBtn.setAttribute("aria-label",voiceOn?"Turn Tripu's voice off":"Turn Tripu's voice on");
+      if(!voiceOn&&synth)synth.cancel();else speak(curSpeech||curText);
+    });
+    const visible=el=>el&&!el.hidden&&el.getClientRects().length>0;
+    function stage(){
+      const total=DEPTS.length,done=opened.size;
+      if(!$("gate").classList.contains("open"))return{key:"gate",t:$("openBtn"),msg:"Namaste Sir! I am Tripu, the STPL birthday trailer. Tap the gate to open your special delivery."};
+      if(!$("overlay").hidden){
+        const d=lastCar?DEPTS[+lastCar.dataset.i]:null;
+        return{key:"note"+(lastCar?lastCar.dataset.i:"")+"-"+done,t:$("closeNote"),msg:"I am reading this wish for you, Sir. When it ends, tap Mark as delivered.",
+          speech:d?("A birthday message from the "+d.name+". "+d.title+". "+d.msg+" ... With respect, the "+d.name+". Sir, please tap Mark as delivered."):null};
+      }
+      if(done<total){
+        const next=document.querySelector("#rig .car:not(.done)");
+        return{key:"cars"+done,t:next,scroll:true,msg:done===0
+          ?"Every department has loaded a birthday wish on my trailer. Tap any car to open its message."
+          :done+" of "+total+" wishes delivered! Tap the next car, Sir."};
+      }
+      if($("cakeScene").hidden)return{key:"cake",t:$("toCake"),scroll:true,msg:"All "+total+" wishes delivered! Now tap One last delivery."};
+      if($("posterScene").hidden){
+        const left=document.querySelectorAll("#candles .candle:not(.out)");
+        if(left.length===5)return{key:"c5",t:left[0],scroll:true,msg:"Make a wish, Sir! Tap each candle to blow it out. Every candle sends my birthday truck to one zone."};
+        if(left.length>0)return{key:"c"+left.length,t:left[0],msg:(5-left.length)+(5-left.length===1?" zone":" zones")+" done! "+left.length+(left.length===1?" candle":" candles")+" to go. Keep blowing!"};
+        return{key:"c0",t:null,msg:"Green signal! Your wish has reached every zone of STPL."};
+      }
+      return{key:"poster",t:null,msg:"Happy Birthday, Sir! Wishes delivered to every corner of STPL. With love from your whole team.",
+        speech:"Happy Birthday, Mister Hargobind Pruthi! You built more than a fleet. You built a family that moves India, and every one of us is proud to travel with you. With respect and gratitude, your STPL family."};
+    }
+    function sync(){
+      const s=stage();target=visible(s.t)?s.t:null;
+      G.classList.toggle("mini",s.key.startsWith("note"));
+      if(s.key!==lastKey){
+        lastKey=s.key;say(s.msg,s.speech);
+        if(s.scroll&&target)setTimeout(()=>{try{target.scrollIntoView({behavior:"smooth",block:"center"});}catch(e){}},350);
+      }
+    }
+    function place(){
+      if(target&&visible(target)){
+        const r=target.getBoundingClientRect();
+        const onScreen=r.bottom>0&&r.top<innerHeight&&r.width>0;
+        hint.hidden=!onScreen;
+        if(onScreen){
+          const cx=r.left+r.width/2,cy=r.top+r.height/2;
+          hint.style.transform="translate("+cx+"px,"+cy+"px)";
+          hint.classList.toggle("below",r.top<90);
+          // keep Tripu out of the way of the thing he points at
+          // keep Tripu and his bubble away from the thing he points at
+          G.classList.toggle("top",cy>innerHeight*.48);
+          G.classList.remove("left");
+        }
+      }else{hint.hidden=true;G.classList.remove("top");}
+      requestAnimationFrame(place);
+    }
+    document.addEventListener("click",()=>setTimeout(sync,120),true);
+    setInterval(sync,700);
+    say(curText);lastKey="gate";sync();requestAnimationFrame(place);
+  })();
   $("openBtn").addEventListener("click",openGate);
   document.querySelectorAll(".door").forEach(d=>d.addEventListener("click",openGate));
 
