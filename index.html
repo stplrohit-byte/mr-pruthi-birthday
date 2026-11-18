@@ -662,7 +662,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
         let started=false;keep=[];
         parts.forEach((part,i)=>{
           const u=new SpeechSynthesisUtterance(part);
-          if(voice)u.voice=voice;u.lang=voice?voice.lang:"en-IN";u.rate=.93;u.pitch=1.15;u.volume=1;
+          if(voice)u.voice=voice;u.lang=voice?voice.lang:"en-IN";u.rate=1.0;u.pitch=1.32;u.volume=1;
           u.onstart=()=>{started=true;cap.hidden=true;talking(true);};
           if(i===parts.length-1)u.onend=()=>talking(false);
           u.onerror=()=>{if(i===parts.length-1)talking(false);};
@@ -680,7 +680,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
       if(synth){try{synth.resume();pickVoice();}catch(e){}}
     }
     // the very first sentence must start inside the tap itself (iPhone and Chrome rule)
-    const WELCOME_CARS="Namaste Sir, and a very Happy Birthday! I am Tripu, your STPL birthday trailer. Every department has loaded a birthday wish on my trailer. Tap any car to open its message.";
+    const WELCOME_CARS="Namaste Sir! Happy, happy Birthday! I am Tripu, your STPL birthday trailer, and I am so excited to see you! Every department has loaded a special wish on my trailer. Tap any car, and let's open them together!";
     function gateTap(){
       if($("gate").classList.contains("open"))return;
       unlocked=true;firstTalk=false;lastKey="cars0";curSpeech=WELCOME_CARS;hop();speak(WELCOME_CARS);
@@ -698,28 +698,28 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
     function stage(){
       const total=DEPTS.length,done=opened.size;
       if(!$("gate").classList.contains("open"))
-        return{key:"gate",t:$("openBtn"),a:$("plate"),side:"below",say:"Namaste Sir! Happy Birthday! I am Tripu, your STPL birthday trailer. Tap the gate to open your special delivery."};
+        return{key:"gate",t:$("openBtn"),a:$("plate"),side:"below",say:"Namaste Sir! Happy Birthday! I am Tripu, your STPL birthday trailer. Tap the gate to open your special delivery!"};
       if(!$("overlay").hidden){
         const d=lastCar?DEPTS[+lastCar.dataset.i]:null;
         return{key:"note"+(lastCar?lastCar.dataset.i:"")+"-"+done,t:$("closeNote"),a:null,park:"topleft",
-          say:d?("A birthday message from the "+d.name+". "+d.title+". "+d.msg+" With respect, the "+d.name+". Sir, please tap Mark as delivered."):"Please tap Mark as delivered."};
+          say:d?("Yay! A birthday message from the "+d.name+"! "+d.title+"! "+d.msg+" With respect, the "+d.name+". Lovely, isn't it? Sir, please tap Mark as delivered!"):"Sir, please tap Mark as delivered!"};
       }
       if(done<total){
         const next=document.querySelector("#rig .car:not(.done)");
         let line=done===0
-          ?"Every department has loaded a birthday wish on my trailer. Tap any car to open its message."
-          :(total-done===1?"Only one wish left, Sir. Tap the last car.":done+(done===1?" wish":" wishes")+" delivered, "+(total-done)+" to go. Tap the next car, Sir.");
+          ?"Every department has loaded a special wish on my trailer. Tap any car to open its message!"
+          :(total-done===1?"Yay! Only one wish left, Sir! Tap the last car!":"Wonderful! "+done+(done===1?" wish":" wishes")+" delivered, "+(total-done)+" to go! Tap the next car, Sir!");
         return{key:"cars"+done,t:next,a:$("rig"),side:"below",scroll:true,say:line};
       }
-      if($("cakeScene").hidden)return{key:"cake",t:$("toCake"),a:$("toCake"),side:"right",scroll:true,say:"All "+total+" wishes are delivered, Sir! Now tap One last delivery."};
+      if($("cakeScene").hidden)return{key:"cake",t:$("toCake"),a:$("toCake"),side:"right",scroll:true,say:"Hooray! All "+total+" wishes are delivered, Sir! Now tap One last delivery!"};
       if($("posterScene").hidden){
         const left=document.querySelectorAll("#candles .candle:not(.out)");
         const a=document.querySelector(".cake");
-        if(left.length===5)return{key:"c5",t:left[0],a,side:"corner",scroll:true,say:"Make a wish, Sir! Tap each candle to blow it out. Every candle sends my birthday truck to one zone of STPL."};
-        if(left.length>0)return{key:"c"+left.length,t:left[0],a,side:"corner",say:left.length===1?"Last candle, Sir! Blow it out!":left.length+" candles to go. Keep blowing!"};
-        return{key:"c0",t:null,a,side:"corner",say:"Green signal! Your wish has reached every zone of STPL."};
+        if(left.length===5)return{key:"c5",t:left[0],a,side:"corner",scroll:true,say:"Time to make a wish, Sir! Tap each candle to blow it out. Every candle sends my birthday truck zooming to one zone of STPL!"};
+        if(left.length>0)return{key:"c"+left.length,t:left[0],a,side:"corner",say:left.length===1?"Last candle, Sir! Blow it out, whoosh!":"Woohoo! "+left.length+" candles to go! Keep blowing!"};
+        return{key:"c0",t:null,a,side:"corner",say:"Green signal! Your wish has reached every zone of STPL! Hooray!"};
       }
-      return{key:"poster",t:null,a:null,park:"corner",say:"Happy Birthday, Mister Hargobind Pruthi! You built more than a fleet. You built a family that moves India, and every one of us is proud to travel with you. With respect and gratitude, your STPL family."};
+      return{key:"poster",t:null,a:null,park:"corner",say:"Happy Birthday, Mister Hargobind Pruthi! You built more than a fleet. You built a family that moves India, and every one of us is proud to travel with you! Have a wonderful, healthy and happy year ahead, Sir! With respect and gratitude, your STPL family."};
     }
     function sync(){
       const s=stage();target=visible(s.t)?s.t:null;anchor=visible(s.a)?s.a:null;park=s.park||"corner";G._side=s.side;
