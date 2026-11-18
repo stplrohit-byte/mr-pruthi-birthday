@@ -318,6 +318,9 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
 .g-voice svg{width:13px;height:13px}
 .g-voice.off{opacity:.6}
 .g-voice.off .wave{display:none}
+.g-cap{position:absolute;bottom:calc(100% + 6px);right:0;width:max-content;max-width:min(210px,60vw);background:var(--ink);color:#fff;font-size:11.5px;line-height:1.35;
+  font-weight:600;padding:6px 9px;border-radius:10px;box-shadow:0 6px 16px rgba(29,42,68,.25)}
+.guide.right-side .g-cap{right:auto;left:0}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .tap-hint{position:fixed;left:0;top:0;z-index:85;pointer-events:none;width:0;height:0}
 .tap-hint .ring{position:absolute;left:-24px;top:-24px;width:48px;height:48px;border-radius:50%;border:3px solid var(--gold);box-shadow:0 0 0 4px rgba(242,181,68,.25);animation:ringPulse 1.3s ease-out infinite}
@@ -346,6 +349,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
 <canvas id="fx"></canvas>
 <div class="guide" id="guide">
   <span class="sr-only" id="gText" aria-live="polite"></span>
+  <span class="g-cap" id="gCap" hidden></span>
   <span class="g-waves" aria-hidden="true"><i></i><i></i><i></i></span>
   <button class="g-bot" id="gBot" type="button" aria-label="Tripu, the STPL birthday trailer. Tap to hear him again">
     <svg viewBox="0 0 120 138" aria-hidden="true">
@@ -644,22 +648,45 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
       clearTimeout(talkTimer);G.classList.toggle("talk",on);duck(on);
       if(on&&ms)talkTimer=setTimeout(()=>talking(false),ms);
     }
+    const cap=$("gCap");let capTimer=0,keep=[];
+    function showCap(t){cap.textContent=t;cap.hidden=false;clearTimeout(capTimer);capTimer=setTimeout(()=>{cap.hidden=true;},Math.max(5000,t.length*70));}
     function speak(t){
       if(!t)return;live.textContent=t;
-      if(!synth||!voiceOn||!unlocked){return;}
+      if(!synth||!voiceOn){showCap(t);talking(true,Math.min(8000,t.length*60));return;}
+      if(!unlocked){return;}
       try{
-        synth.cancel();const u=new SpeechSynthesisUtterance(t);
-        if(voice)u.voice=voice;u.lang=voice?voice.lang:"en-IN";u.rate=.93;u.pitch=1.2;
-        u.onstart=()=>talking(true);u.onend=u.onerror=()=>talking(false);
-        talking(true,Math.min(60000,t.length*85));
-        synth.speak(u);
-      }catch(e){}
+        if(synth.speaking||synth.pending)synth.cancel();
+        synth.resume();
+        // speak sentence by sentence: Chrome cuts off one long utterance after ~15 s
+        const parts=(t.match(/[^.!?]+[.!?]*/g)||[t]).map(x=>x.trim()).filter(Boolean);
+        let started=false;keep=[];
+        parts.forEach((part,i)=>{
+          const u=new SpeechSynthesisUtterance(part);
+          if(voice)u.voice=voice;u.lang=voice?voice.lang:"en-IN";u.rate=.93;u.pitch=1.15;u.volume=1;
+          u.onstart=()=>{started=true;cap.hidden=true;talking(true);};
+          if(i===parts.length-1)u.onend=()=>talking(false);
+          u.onerror=()=>{if(i===parts.length-1)talking(false);};
+          keep.push(u);synth.speak(u);
+        });
+        window.__tripuQueue=keep; // keep a reference so the browser cannot drop it
+        talking(true,Math.min(90000,t.length*90));
+        // no voice on this phone? show a small caption instead
+        setTimeout(()=>{if(!started&&!synth.speaking)showCap(t);},2200);
+      }catch(e){showCap(t);}
     }
     function hop(){bot.classList.remove("hop");void bot.offsetWidth;bot.classList.add("hop");}
     function unlock(){
       if(unlocked)return;unlocked=true;
-      if(synth&&voiceOn){try{synth.speak(new SpeechSynthesisUtterance(" "));}catch(e){}}
+      if(synth){try{synth.resume();pickVoice();}catch(e){}}
     }
+    // the very first sentence must start inside the tap itself (iPhone and Chrome rule)
+    const WELCOME_CARS="Namaste Sir, and a very Happy Birthday! I am Tripu, your STPL birthday trailer. Every department has loaded a birthday wish on my trailer. Tap any car to open its message.";
+    function gateTap(){
+      if($("gate").classList.contains("open"))return;
+      unlocked=true;firstTalk=false;lastKey="cars0";curSpeech=WELCOME_CARS;hop();speak(WELCOME_CARS);
+    }
+    $("openBtn").addEventListener("click",gateTap);
+    document.querySelectorAll(".door").forEach(d=>d.addEventListener("click",gateTap));
     document.addEventListener("pointerdown",unlock,{capture:true});
     bot.addEventListener("click",()=>{unlock();hop();speak(curSpeech);});
     vBtn.addEventListener("click",()=>{
@@ -681,8 +708,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
         const next=document.querySelector("#rig .car:not(.done)");
         let line=done===0
           ?"Every department has loaded a birthday wish on my trailer. Tap any car to open its message."
-          :(total-done===1?"Only one wish left, Sir. Tap the last car.":done+" wishes delivered, "+(total-done)+" to go. Tap the next car, Sir.");
-        if(done===0&&firstTalk)line="Namaste Sir, and a very Happy Birthday! I am Tripu, your STPL birthday trailer. "+line;
+          :(total-done===1?"Only one wish left, Sir. Tap the last car.":done+(done===1?" wish":" wishes")+" delivered, "+(total-done)+" to go. Tap the next car, Sir.");
         return{key:"cars"+done,t:next,a:$("rig"),side:"below",scroll:true,say:line};
       }
       if($("cakeScene").hidden)return{key:"cake",t:$("toCake"),a:$("toCake"),side:"right",scroll:true,say:"All "+total+" wishes are delivered, Sir! Now tap One last delivery."};
