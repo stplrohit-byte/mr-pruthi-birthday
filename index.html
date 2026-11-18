@@ -236,12 +236,14 @@ p{margin:0}
 /* trip panel: zone map + signal + tracker log */
 .trip{width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;text-align:left;
   background:var(--steel);border:1px solid var(--line);border-radius:12px;padding:14px}
-@media (max-width:560px){.trip{grid-template-columns:1fr}}
+@media (max-width:560px){.cake-scene{gap:10px;scroll-margin-top:12px}.cake-scene .hint{display:none}.cake-scene h2{font-size:24px}.cake{width:min(250px,72vw)}.tier.t1{height:48px}.tier.t2{height:60px;font-size:17px}.trip{grid-template-columns:1fr;gap:10px;padding:12px}.map{max-width:240px}.log li:not(:nth-last-child(-n+2)){display:none}}
 .trip-head{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em}
 .trip-head b{color:var(--gold-deep);font-weight:600}
 .status{border-radius:999px;padding:3px 10px;background:#fde4df;color:#c2412d}
 .status.go{background:#d9f3ea;color:var(--done)}
-.map{width:100%;max-width:320px;height:auto;justify-self:center;display:block}
+.map{width:100%;max-width:300px;height:auto;justify-self:center;display:block}
+.map .india{fill:#eef4fc;stroke:#8fa3c2;stroke-width:1.6;stroke-linejoin:round}
+.map text{paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round;font-weight:600}
 .map .ghost-dot{fill:#c3cddc}
 .map .hub{fill:#e9f0fa;stroke:#8a99b2;stroke-width:1.5;transition:fill .4s,stroke .4s}
 .map .hub.lit{fill:var(--gold);stroke:var(--gold-deep)}
@@ -464,11 +466,11 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
     <div class="trip" aria-live="polite">
       <div class="trip-head"><span>TRIP <b>HBD-1911</b> · ORIGIN STPL HQ</span><span class="status" id="tripStatus">WAITING</span></div>
       <svg class="map" id="map" viewBox="0 0 300 300" role="img" aria-label="Route map of STPL zones">
-        <path class="border" d="M100 8 L140 22 L150 60 L200 70 L250 82 L290 100 L290 135 L250 152 L180 165 L160 210 L120 290 L95 250 L60 200 L45 150 L10 125 L25 100 L60 80 L75 40 Z"/>
+        <path class="india" d="M65.0 0.0 L95.0 14.0 L106.0 26.0 L115.0 44.0 L108.0 58.0 L126.0 69.0 L136.0 67.0 L160.0 84.0 L200.0 91.0 L208.0 90.0 L216.0 102.0 L240.0 101.0 L275.0 78.0 L293.0 88.0 L280.0 105.0 L266.0 120.0 L260.0 135.0 L253.0 150.0 L244.0 141.0 L241.0 127.0 L239.0 124.0 L218.0 112.0 L204.0 127.0 L209.0 154.0 L190.0 158.0 L185.0 168.0 L170.0 178.0 L155.0 190.0 L143.0 204.0 L123.0 212.0 L122.0 235.0 L118.0 255.0 L118.0 267.0 L102.0 281.0 L95.0 289.0 L85.0 280.0 L78.0 255.0 L68.0 238.0 L60.0 218.0 L54.0 205.0 L48.0 180.0 L49.0 162.0 L46.0 157.0 L28.0 162.0 L10.0 146.0 L4.0 134.0 L20.0 125.0 L30.0 125.0 L24.0 112.0 L16.0 100.0 L26.0 90.0 L40.0 71.0 L57.0 66.0 L65.0 60.0 L66.0 42.0 L55.0 30.0 L60.0 15.0 Z"/>
         <g id="ghosts"></g>
         <g id="segs"></g>
         <g id="hubs"></g>
-        <g id="truck" style="transform:translate(112px,39px)">
+        <g id="truck" style="transform:translate(89px,86px)">
           <g transform="translate(-9,-14)">
             <rect x="0" y="2" width="12" height="7" rx="1" fill="#f2b544"/>
             <path d="M12 4 L16 4 L18 7 L18 9 L12 9 Z" fill="#c98a1c"/>
@@ -765,7 +767,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
       if($("posterScene").hidden){
         const left=document.querySelectorAll("#candles .candle:not(.out)");
         const a=document.querySelector(".cake");
-        if(left.length===5)return{key:"c5",t:left[0],a,side:"corner",scroll:true,say:"Time to make a wish, Sir! Tap each candle to blow it out. Every candle sends my birthday truck zooming to one zone of STPL!"};
+        if(left.length===5)return{key:"c5",t:left[0],a,side:"corner",scroll:true,scrollEl:$("cakeScene"),say:"Time to make a wish, Sir! Tap each candle to blow it out. Every candle sends my birthday truck zooming to one zone of STPL!"};
         if(left.length>0)return{key:"c"+left.length,t:left[0],a,side:"corner",say:left.length===1?"Last candle, Sir! Blow it out, whoosh!":"Woohoo! "+left.length+" candles to go! Keep blowing!"};
         return{key:"c0",t:null,a,side:"corner",say:"Green signal! Your wish has reached every zone of STPL! Hooray!"};
       }
@@ -785,7 +787,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
         lastKey=s.key;curSpeech=s.say;curClip=clipFor(s.key);hop();
         if(s.key.startsWith("cars")&&unlocked)firstTalk=false;
         speak(s.say,curClip);
-        if(s.scroll&&target)setTimeout(()=>{try{target.scrollIntoView({behavior:"smooth",block:"center"});}catch(e){}},350);
+        if(s.scroll&&target)setTimeout(()=>{try{(s.scrollEl||target).scrollIntoView({behavior:"smooth",block:s.scrollEl?"start":"center"});}catch(e){}},350);
       }
     }
     let gx=-80,gy=0,lastMove=0;
@@ -830,13 +832,13 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
   });
   // zones: map x=(lon-70)*16, y=(31-lat)*15
   const ZONES=[
-    {zone:"North",x:112,y:39,msg:"Wish loaded and dispatched from HQ"},
-    {zone:"West GJ",x:32,y:114,msg:"Wish delivered across Gujarat"},
-    {zone:"West MH",x:62,y:187,msg:"Wish delivered across Maharashtra"},
-    {zone:"South",x:165,y:268,msg:"Wish delivered across the South"},
-    {zone:"East",x:277,y:130,msg:"Wish delivered across the East"}
+    {zone:"North",x:89,y:86,msg:"Wish loaded and dispatched from HQ"},
+    {zone:"West GJ",x:41,y:135,msg:"Wish delivered across Gujarat"},
+    {zone:"West MH",x:59,y:185,msg:"Wish delivered across Maharashtra"},
+    {zone:"South",x:123,y:239,msg:"Wish delivered across the South"},
+    {zone:"East",x:193,y:147,msg:"Wish delivered across the East"}
   ];
-  const GHOSTS=[[132,17],[150,30],[58,112],[38,120],[56,127],[61,165],[117,273],[150,210],[110,40]];
+  const GHOSTS=[[102,71],[114,80],[58,170],[95,241],[55,145],[108,233],[160,120],[130,150],[75,100]];
   const NS="http://www.w3.org/2000/svg";
   const mk=(tag,attrs)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;};
   GHOSTS.forEach(([x,y])=>$("ghosts").appendChild(mk("circle",{cx:x,cy:y,r:2,class:"ghost-dot"})));
@@ -846,7 +848,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
     const t=mk("text",{x:z.x>150?z.x-8:tx,y:z.y+3,"text-anchor":z.x>150?"end":anchor});t.textContent=z.zone;
     $("hubs").append(c,r,t);return {c,r,t};
   });
-  let lit=5,truckAt={x:112,y:39},stamp=0;
+  let lit=5,truckAt={x:89,y:86},stamp=0;
   function tripStep(i){
     const z=ZONES[i],h=hubEls[i];
     if(truckAt.x!==z.x||truckAt.y!==z.y){
@@ -892,8 +894,8 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
     $("candles").appendChild(c);
   });
   function resetTrip(){
-    lit=5;stamp=0;truckAt={x:112,y:39};
-    $("truck").style.transform="translate(112px,39px)";
+    lit=5;stamp=0;truckAt={x:89,y:86};
+    $("truck").style.transform="translate(89px,86px)";
     $("segs").innerHTML="";
     hubEls.forEach(h=>{h.c.classList.remove("lit");h.t.classList.remove("lit");});
     $("log").innerHTML='<li class="empty">Tracker log · no movement yet</li>';
